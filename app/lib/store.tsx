@@ -7,20 +7,16 @@ import type {
   Stakeholder,
   Deal,
   Action,
-  Meeting,
-  DealAsset,
-  OutreachTemplate,
-  ICPCriteria,
+  ICPSession,
+  Narrative,
 } from './types';
 import {
   mockAccounts,
   mockStakeholders,
   mockDeals,
   mockActions,
-  mockMeetings,
-  mockDealAssets,
-  mockOutreachTemplates,
-  mockICPCriteria,
+  mockICPSessions,
+  mockNarratives,
 } from '@/data/mockData';
 
 // Navigation state
@@ -42,10 +38,8 @@ interface AppState {
   stakeholders: Stakeholder[];
   deals: Deal[];
   actions: Action[];
-  meetings: Meeting[];
-  assets: DealAsset[];
-  templates: OutreachTemplate[];
-  icpCriteria: ICPCriteria[];
+  icpSessions: ICPSession[];
+  narratives: Narrative[];
 
   // Actions
   updateDeal: (id: string, updates: Partial<Deal>) => void;
@@ -59,6 +53,8 @@ interface AppState {
   getDealById: (id: string) => Deal | undefined;
   getStakeholdersByAccount: (accountId: string) => Stakeholder[];
   getActionsByDeal: (dealId: string) => Action[];
+  getICPSessionById: (id: string) => ICPSession | undefined;
+  getNarrativeById: (id: string) => Narrative | undefined;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -69,10 +65,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [stakeholders] = useState<Stakeholder[]>(mockStakeholders);
   const [deals, setDeals] = useState<Deal[]>(mockDeals);
   const [actions, setActions] = useState<Action[]>(mockActions);
-  const [meetings] = useState<Meeting[]>(mockMeetings);
-  const [assets] = useState<DealAsset[]>(mockDealAssets);
-  const [templates] = useState<OutreachTemplate[]>(mockOutreachTemplates);
-  const [icpCriteria] = useState<ICPCriteria[]>(mockICPCriteria);
+  const [icpSessions] = useState<ICPSession[]>(mockICPSessions);
+  const [narratives] = useState<Narrative[]>(mockNarratives);
 
   // Lookup functions
   const getAccountById = (id: string) => accounts.find(a => a.id === id);
@@ -82,6 +76,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     stakeholders.filter(s => s.associatedAccountId === accountId);
   const getActionsByDeal = (dealId: string) =>
     actions.filter(a => a.linkedDealId === dealId);
+  const getICPSessionById = (id: string) => icpSessions.find(i => i.id === id);
+  const getNarrativeById = (id: string) => narratives.find(n => n.id === id);
 
   // Update functions
   const updateDeal = (id: string, updates: Partial<Deal>) => {
@@ -115,10 +111,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     stakeholders,
     deals,
     actions,
-    meetings,
-    assets,
-    templates,
-    icpCriteria,
+    icpSessions,
+    narratives,
     updateDeal,
     updateAction,
     addAction,
@@ -128,6 +122,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     getDealById,
     getStakeholdersByAccount,
     getActionsByDeal,
+    getICPSessionById,
+    getNarrativeById,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
