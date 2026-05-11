@@ -102,57 +102,38 @@ export interface Action {
 }
 
 /**
- * ICP (Ideal Customer Profile) Criteria
- * Defines the target matrix for opportunity prioritization
+ * ICP Session — Output of an ICP Forge session
  */
-export interface ICPCriteria {
+export interface ICPSession {
   id: string;
-  dimension: string;
-  weight: number; // 1-10
-  description: string;
-}
-
-/**
- * Meeting - Scheduled interaction with stakeholders
- */
-export interface Meeting {
-  id: string;
-  title: string;
-  linkedDealId?: string;
-  stakeholderIds: string[];
-  scheduledDate: string;
-  duration: number; // minutes
-  meetingType: 'intro' | 'discovery' | 'proposal' | 'negotiation' | 'check-in' | 'other';
-  agenda?: string;
-  notes?: string;
-  outcome?: string;
-  completed: boolean;
-}
-
-/**
- * Asset - Deal collateral and materials
- */
-export interface DealAsset {
-  id: string;
-  name: string;
-  type: 'deck' | 'one-pager' | 'case-study' | 'proposal' | 'contract' | 'other';
-  linkedDealIds: string[];
-  url?: string;
-  notes?: string;
+  segment: string;
+  jobToBeDone: string;
+  fitSignals: string[];
+  antiICPFlags: string[];
+  firstTargetList: string[];
   createdAt: string;
-  updatedAt: string;
 }
 
 /**
- * Outreach Template - Reusable message templates
+ * Narrative — Output of a Narrative Engine session
  */
-export interface OutreachTemplate {
+export interface Narrative {
   id: string;
-  name: string;
-  channel: 'email' | 'linkedin' | 'other';
-  subject?: string;
-  body: string;
-  tags: string[];
-  useCount: number;
-  lastUsed?: string;
+  linkedICPId?: string;
+  positioningStatement: string;
+  warmIntroPitch: string;
+  coldOutreachPitch: string;
+  investorFacingPitch: string;
+  talkingPoints: string[];
+  createdAt: string;
+}
+
+/**
+ * CoreEngineSignal — Surfaced by Core Engine service layer
+ */
+export interface CoreEngineSignal {
+  dealId: string;
+  signalType: 'momentum_drop' | 'overdue_action' | 'stalled' | 'high_momentum';
+  message: string;
+  priority: 1 | 2 | 3;
 }

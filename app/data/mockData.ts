@@ -3,10 +3,8 @@ import type {
   Stakeholder,
   Deal,
   Action,
-  ICPCriteria,
-  Meeting,
-  DealAsset,
-  OutreachTemplate,
+  ICPSession,
+  Narrative,
 } from '@/lib/types';
 
 // Mock Accounts - Strategic organizations in the network
@@ -314,215 +312,39 @@ export const mockActions: Action[] = [
   },
 ];
 
-// Mock ICP Criteria - Target matrix dimensions
-export const mockICPCriteria: ICPCriteria[] = [
+// Mock ICP Sessions — Output of ICP Forge sessions
+export const mockICPSessions: ICPSession[] = [
   {
     id: 'icp-001',
-    dimension: 'Revenue Scale',
-    weight: 9,
-    description: 'Annual revenue > $100M preferred',
+    segment: 'Early-stage SaaS founders post-product, pre-revenue',
+    jobToBeDone: 'Validate go-to-market angle before burning runway on the wrong ICP',
+    fitSignals: ['Has a working product', 'No dedicated BD hire', 'Founder-led sales', 'Under $500K raised'],
+    antiICPFlags: ['Seeking investor intros only', 'Pre-product', 'Already has BD team'],
+    firstTargetList: ['Founder communities (YC, Indie Hackers)', 'No-code builder audiences', 'Accelerator cohort members'],
+    createdAt: '2025-03-01',
   },
   {
     id: 'icp-002',
-    dimension: 'Digital Maturity',
-    weight: 8,
-    description: 'Active digital transformation initiative',
-  },
-  {
-    id: 'icp-003',
-    dimension: 'Decision Speed',
-    weight: 7,
-    description: 'Can make purchasing decisions < 90 days',
-  },
-  {
-    id: 'icp-004',
-    dimension: 'Strategic Alignment',
-    weight: 10,
-    description: 'Clear use case fit with our core offering',
-  },
-  {
-    id: 'icp-005',
-    dimension: 'Relationship Access',
-    weight: 8,
-    description: 'Warm path to economic buyer',
-  },
-  {
-    id: 'icp-006',
-    dimension: 'Expansion Potential',
-    weight: 7,
-    description: 'Multiple business units or geographies',
+    segment: 'Creator economy platforms seeking brand partnership revenue',
+    jobToBeDone: 'Build a repeatable BD motion to convert inbound interest into structured deals',
+    fitSignals: ['100K+ creator base', 'Brand partnership inquiries coming in unstructured', 'No dedicated partnerships function'],
+    antiICPFlags: ['Enterprise media companies', 'No creator community', 'Ad-only revenue model'],
+    firstTargetList: ['Mid-size creator platforms', 'Newsletter networks', 'Podcast networks with brand deals'],
+    createdAt: '2025-03-15',
   },
 ];
 
-// Mock Meetings - Scheduled interactions
-export const mockMeetings: Meeting[] = [
+// Mock Narratives — Output of Narrative Engine sessions
+export const mockNarratives: Narrative[] = [
   {
-    id: 'mtg-001',
-    title: 'Atlas Technical Architecture Review',
-    linkedDealId: 'deal-001',
-    stakeholderIds: ['stk-002', 'stk-003'],
-    scheduledDate: '2024-03-18T14:00:00',
-    duration: 60,
-    meetingType: 'discovery',
-    agenda: '1. Review technical requirements\n2. Discuss integration timeline\n3. Address security concerns',
-    completed: false,
-  },
-  {
-    id: 'mtg-002',
-    title: 'Northstar Partner Discussion',
-    linkedDealId: 'deal-002',
-    stakeholderIds: ['stk-005'],
-    scheduledDate: '2024-03-19T10:00:00',
-    duration: 45,
-    meetingType: 'intro',
-    agenda: '1. Portfolio overview\n2. Co-investment thesis\n3. Next steps',
-    completed: false,
-  },
-  {
-    id: 'mtg-003',
-    title: 'Evergreen Expansion Planning',
-    linkedDealId: 'deal-003',
-    stakeholderIds: ['stk-006'],
-    scheduledDate: '2024-03-15T11:00:00',
-    duration: 30,
-    meetingType: 'proposal',
-    agenda: '1. Review pilot results\n2. Present expansion proposal\n3. Discuss timeline',
-    completed: false,
-  },
-  {
-    id: 'mtg-004',
-    title: 'Velocity AI Partnership Sync',
-    linkedDealId: 'deal-005',
-    stakeholderIds: ['stk-004'],
-    scheduledDate: '2024-03-14T15:00:00',
-    duration: 45,
-    meetingType: 'negotiation',
-    agenda: '1. Review agreement terms\n2. Align on revenue share\n3. Plan joint announcements',
-    completed: false,
-  },
-];
-
-// Mock Deal Assets - Collateral and materials
-export const mockDealAssets: DealAsset[] = [
-  {
-    id: 'asset-001',
-    name: 'Enterprise Platform Overview Deck',
-    type: 'deck',
-    linkedDealIds: ['deal-001', 'deal-003'],
-    url: '/assets/enterprise-deck-v3.pdf',
-    notes: 'Updated March 2024. Includes new case studies.',
-    createdAt: '2024-01-10',
-    updatedAt: '2024-03-01',
-  },
-  {
-    id: 'asset-002',
-    name: 'ROI Calculator Model',
-    type: 'other',
-    linkedDealIds: ['deal-001'],
-    url: '/assets/roi-calculator.xlsx',
-    notes: 'Customizable for enterprise deals. Use with CDO conversations.',
-    createdAt: '2024-02-15',
-    updatedAt: '2024-03-05',
-  },
-  {
-    id: 'asset-003',
-    name: 'Logistics Industry Case Study',
-    type: 'case-study',
-    linkedDealIds: ['deal-003', 'deal-004'],
-    url: '/assets/logistics-case-study.pdf',
-    notes: 'Evergreen pilot results. Strong metrics.',
-    createdAt: '2024-02-28',
-    updatedAt: '2024-02-28',
-  },
-  {
-    id: 'asset-004',
-    name: 'Partnership One-Pager',
-    type: 'one-pager',
-    linkedDealIds: ['deal-005', 'deal-006'],
-    url: '/assets/partnership-onepager.pdf',
-    notes: 'For partner and platform discussions.',
-    createdAt: '2024-01-20',
-    updatedAt: '2024-02-10',
-  },
-  {
-    id: 'asset-005',
-    name: 'Security & Compliance Overview',
-    type: 'other',
-    linkedDealIds: ['deal-001'],
-    url: '/assets/security-overview.pdf',
-    notes: 'SOC2, GDPR, enterprise security requirements.',
-    createdAt: '2024-01-05',
-    updatedAt: '2024-01-05',
-  },
-];
-
-// Mock Outreach Templates
-export const mockOutreachTemplates: OutreachTemplate[] = [
-  {
-    id: 'tmpl-001',
-    name: 'Executive Intro - Cold',
-    channel: 'email',
-    subject: 'Quick question about [Company] strategy',
-    body: `Hi [Name],
-
-I've been following [Company]'s work in [area] and noticed [specific observation].
-
-We've helped companies like [reference] achieve [outcome]. I'd love to share a few insights that might be relevant to your [initiative].
-
-Would you have 15 minutes this week or next?
-
-Best,
-[Signature]`,
-    tags: ['cold', 'executive', 'intro'],
-    useCount: 23,
-    lastUsed: '2024-03-08',
-  },
-  {
-    id: 'tmpl-002',
-    name: 'Warm Intro Follow-up',
-    channel: 'email',
-    subject: 'Following up on [Referrer]\'s introduction',
-    body: `Hi [Name],
-
-[Referrer] suggested we connect regarding [topic]. They mentioned you're exploring [area] and thought our experience with [relevant work] might be valuable.
-
-I'd love to hear more about what you're working on. Would you have time for a brief call this week?
-
-Best,
-[Signature]`,
-    tags: ['warm', 'intro', 'referral'],
-    useCount: 45,
-    lastUsed: '2024-03-10',
-  },
-  {
-    id: 'tmpl-003',
-    name: 'LinkedIn Connection Request',
-    channel: 'linkedin',
-    body: `Hi [Name], I came across your work at [Company] and was impressed by [specific detail]. I'm working on similar challenges in [area] and would value connecting. Looking forward to staying in touch.`,
-    tags: ['linkedin', 'connection', 'networking'],
-    useCount: 67,
-    lastUsed: '2024-03-11',
-  },
-  {
-    id: 'tmpl-004',
-    name: 'Meeting Follow-up',
-    channel: 'email',
-    subject: 'Great connecting - next steps',
-    body: `Hi [Name],
-
-Thank you for taking the time to meet today. I really enjoyed our conversation about [topic].
-
-As discussed, here are the next steps:
-1. [Action item 1]
-2. [Action item 2]
-
-I'll [your action] by [date]. Looking forward to continuing the conversation.
-
-Best,
-[Signature]`,
-    tags: ['follow-up', 'meeting', 'next-steps'],
-    useCount: 89,
-    lastUsed: '2024-03-11',
+    id: 'narr-001',
+    linkedICPId: 'icp-001',
+    positioningStatement: 'NextWave helps vibe-coded founders build a BD motion before they hire one — so the first BD hire has something to inherit, not build from scratch.',
+    warmIntroPitch: 'Happy to connect — we work with founders who have product-market fit intuition but need a structured way to convert conversations into deals. If that resonates with where [Name] is, worth a quick call.',
+    coldOutreachPitch: "I work with early-stage founders who are closing deals personally but don't yet have a repeatable motion. Most don't need a BD hire yet — they need a methodology. We built one. Would it be useful to pressure-test your current approach?",
+    investorFacingPitch: 'We provide fractional BD infrastructure to post-product, pre-scale founders — specifically the ICP clarity, narrative, and pipeline architecture that makes the first BD hire 3x more effective.',
+    talkingPoints: ['Methodology over tooling', 'Human-in-the-loop always', 'ICP first, outreach second', 'Deal as atomic unit'],
+    createdAt: '2025-03-20',
   },
 ];
 
