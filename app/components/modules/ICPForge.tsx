@@ -1,230 +1,185 @@
 'use client';
 
+import { useState } from 'react';
 import { useApp } from '@/lib/store';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
-import { AccountTypeBadge } from '../ui/Badge';
-import { RelationshipStrength } from '../ui/RelationshipStrength';
-import { Target, ChevronRight } from 'lucide-react';
+import { Card, CardContent } from '../ui/Card';
+import { Badge } from '../ui/Badge';
+import {
+  Target,
+  Plus,
+  Check,
+  AlertTriangle,
+  ArrowRight,
+  FileText,
+} from 'lucide-react';
 
-export default function ICPMatrix() {
-  const { accounts, icpCriteria, deals, setCurrentModule } = useApp();
+export default function ICPForge() {
+  const { icpSessions, setCurrentModule } = useApp();
+  const [selectedId, setSelectedId] = useState<string | null>(
+    icpSessions[0]?.id ?? null
+  );
 
-  // Calculate ICP score for each account based on criteria
-  const calculateICPScore = (accountId: string): number => {
-    const account = accounts.find(a => a.id === accountId);
-    if (!account) return 0;
+  const selected = icpSessions.find(s => s.id === selectedId) ?? null;
 
-    // Simplified scoring based on account attributes and activity
-    const hasActiveDeals = deals.some(
-      d => d.associatedAccountIds.includes(accountId) && d.status === 'active'
-    );
-    const dealCount = deals.filter(d =>
-      d.associatedAccountIds.includes(accountId)
-    ).length;
+  const truncate = (text: string, max = 90) =>
+    text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
 
-    // Base score from relationship strength
-    let score = account.relationshipStrength * 15;
-
-    // Bonus for active deals
-    if (hasActiveDeals) score += 20;
-    score += dealCount * 5;
-
-    // Cap at 100
-    return Math.min(score, 100);
-  };
-
-  // Sort accounts by ICP score
-  const rankedAccounts = accounts
-    .map(account => ({
-      ...account,
-      icpScore: calculateICPScore(account.id),
-      dealCount: deals.filter(d => d.associatedAccountIds.includes(account.id)).length,
-    }))
-    .sort((a, b) => b.icpScore - a.icpScore);
-
-  // Split into tiers
-  const tier1 = rankedAccounts.filter(a => a.icpScore >= 70);
-  const tier2 = rankedAccounts.filter(a => a.icpScore >= 40 && a.icpScore < 70);
-  const tier3 = rankedAccounts.filter(a => a.icpScore < 40);
-
-  const getTierColor = (score: number) => {
-    if (score >= 70) return 'tier--high';
-    if (score >= 40) return 'tier--medium';
-    return 'tier--low';
-  };
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
 
   return (
     <div className="module-container">
       <header className="module-header">
         <div>
-          <h1 className="module-title">ICP & Target Matrix</h1>
+          <h1 className="module-title">ICP Forge</h1>
           <p className="module-subtitle">
-            Prioritize opportunities based on ideal customer fit
+            Run a guided session. Walk out with an ICP deliverable, not a spreadsheet.
           </p>
         </div>
       </header>
 
-      {/* ICP Criteria */}
-      <Card className="icp-criteria-card">
-        <CardHeader>
-          <CardTitle>
-            <Target size={18} /> ICP Scoring Criteria
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="criteria-grid">
-            {icpCriteria.map(criteria => (
-              <div key={criteria.id} className="criteria-item">
-                <div className="criteria-header">
-                  <span className="criteria-dimension">{criteria.dimension}</span>
-                  <span className="criteria-weight">Weight: {criteria.weight}/10</span>
-                </div>
-                <p className="criteria-description">{criteria.description}</p>
-                <div className="criteria-bar">
-                  <div
-                    className="criteria-bar-fill"
-                    style={{ width: `${criteria.weight * 10}%` }}
-                  />
-                </div>
+      <div className="icp-forge-layout">
+        {/* Left panel — Session List */}
+        <aside className="icp-session-list">
+          <div className="icp-session-list-header">
+            <span className="icp-session-list-title">Sessions</span>
+            <div className="coming-soon-wrap">
+              <button
+                type="button"
+                className="btn-new-session"
+                disabled
+                aria-disabled="true"
+              >
+                <Plus size={14} />
+                <span>New ICP Session</span>
+              </button>
+              <span className="coming-soon-tooltip" role="tooltip">
+                Coming in BDA Pro
+              </span>
+            </div>
+          </div>
+
+          <div className="icp-session-cards">
+            {icpSessions.length === 0 ? (
+              <p className="empty-state">No ICP sessions yet</p>
+            ) : (
+              icpSessions.map(session => {
+                const isActive = session.id === selectedId;
+                return (
+                  <Card
+                    key={session.id}
+                    onClick={() => setSelectedId(session.id)}
+                    className={`icp-session-card ${
+                      isActive ? 'icp-session-card--active' : ''
+                    }`}
+                  >
+                    <CardContent>
+                      <div className="icp-session-card-header">
+                        <Target size={16} />
+                        <h4 className="icp-session-card-segment">
+                          {session.segment}
+                        </h4>
+                      </div>
+                      <p className="icp-session-card-jtbd">
+                        {truncate(session.jobToBeDone, 110)}
+                      </p>
+                      <div className="icp-session-card-footer">
+                        <span className="icp-session-card-date">
+                          {formatDate(session.createdAt)}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
+          </div>
+        </aside>
+
+        {/* Right panel — Deliverable View */}
+        <section className="icp-deliverable">
+          {!selected ? (
+            <div className="icp-deliverable--empty">
+              <FileText size={32} />
+              <p>Select a session to view its ICP deliverable.</p>
+            </div>
+          ) : (
+            <Card className="icp-deliverable-card">
+              <div className="icp-deliverable-header">
+                <Badge variant="info">ICP Deliverable</Badge>
+                <h2 className="icp-deliverable-title">{selected.segment}</h2>
+                <p className="icp-deliverable-meta">
+                  Created {formatDate(selected.createdAt)}
+                </p>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Target Matrix */}
-      <div className="matrix-container">
-        {/* Tier 1 - High Priority */}
-        <div className="tier-section">
-          <h3 className="tier-header tier-header--high">
-            <span className="tier-badge tier-badge--high">Tier 1</span>
-            High Priority Targets
-            <span className="tier-count">{tier1.length}</span>
-          </h3>
-          <div className="tier-accounts">
-            {tier1.length === 0 ? (
-              <p className="empty-state">No tier 1 accounts</p>
-            ) : (
-              tier1.map(account => (
-                <Card
-                  key={account.id}
-                  className={`matrix-account-card ${getTierColor(account.icpScore)}`}
-                >
-                  <CardContent>
-                    <div className="matrix-account-header">
-                      <h4 className="matrix-account-name">{account.name}</h4>
-                      <span className="icp-score icp-score--high">
-                        {account.icpScore}
-                      </span>
-                    </div>
-                    <div className="matrix-account-meta">
-                      <AccountTypeBadge type={account.type} />
-                      <RelationshipStrength strength={account.relationshipStrength} />
-                    </div>
-                    <p className="matrix-account-relevance">
-                      {account.strategicRelevance}
-                    </p>
-                    <div className="matrix-account-footer">
-                      <span>{account.dealCount} active deal{account.dealCount !== 1 ? 's' : ''}</span>
-                      <button
-                        className="link-button"
-                        onClick={() => setCurrentModule('accounts')}
-                      >
-                        View <ChevronRight size={14} />
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </div>
+              <div className="icp-deliverable-body">
+                {/* Job to Be Done */}
+                <section className="icp-section">
+                  <h3 className="icp-section-label">Job to Be Done</h3>
+                  <p className="icp-jtbd-text">{selected.jobToBeDone}</p>
+                </section>
 
-        {/* Tier 2 - Medium Priority */}
-        <div className="tier-section">
-          <h3 className="tier-header tier-header--medium">
-            <span className="tier-badge tier-badge--medium">Tier 2</span>
-            Development Targets
-            <span className="tier-count">{tier2.length}</span>
-          </h3>
-          <div className="tier-accounts">
-            {tier2.length === 0 ? (
-              <p className="empty-state">No tier 2 accounts</p>
-            ) : (
-              tier2.map(account => (
-                <Card
-                  key={account.id}
-                  className={`matrix-account-card ${getTierColor(account.icpScore)}`}
-                >
-                  <CardContent>
-                    <div className="matrix-account-header">
-                      <h4 className="matrix-account-name">{account.name}</h4>
-                      <span className="icp-score icp-score--medium">
-                        {account.icpScore}
-                      </span>
-                    </div>
-                    <div className="matrix-account-meta">
-                      <AccountTypeBadge type={account.type} />
-                      <RelationshipStrength strength={account.relationshipStrength} />
-                    </div>
-                    <p className="matrix-account-relevance">
-                      {account.strategicRelevance}
-                    </p>
-                    <div className="matrix-account-footer">
-                      <span>{account.dealCount} deal{account.dealCount !== 1 ? 's' : ''}</span>
-                      <button
-                        className="link-button"
-                        onClick={() => setCurrentModule('accounts')}
-                      >
-                        View <ChevronRight size={14} />
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </div>
+                {/* Fit Signals */}
+                <section className="icp-section">
+                  <h3 className="icp-section-label">Fit Signals</h3>
+                  <ul className="icp-fit-signals">
+                    {selected.fitSignals.map((signal, idx) => (
+                      <li key={idx} className="icp-fit-signal">
+                        <span className="icp-fit-signal-icon">
+                          <Check size={14} />
+                        </span>
+                        <span>{signal}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
 
-        {/* Tier 3 - Low Priority */}
-        <div className="tier-section">
-          <h3 className="tier-header tier-header--low">
-            <span className="tier-badge tier-badge--low">Tier 3</span>
-            Monitor & Nurture
-            <span className="tier-count">{tier3.length}</span>
-          </h3>
-          <div className="tier-accounts">
-            {tier3.length === 0 ? (
-              <p className="empty-state">No tier 3 accounts</p>
-            ) : (
-              tier3.map(account => (
-                <Card
-                  key={account.id}
-                  className={`matrix-account-card ${getTierColor(account.icpScore)}`}
-                >
-                  <CardContent>
-                    <div className="matrix-account-header">
-                      <h4 className="matrix-account-name">{account.name}</h4>
-                      <span className="icp-score icp-score--low">
-                        {account.icpScore}
+                {/* Anti-ICP Flags */}
+                <section className="icp-section icp-section--warning">
+                  <h3 className="icp-section-label">
+                    <AlertTriangle size={14} />
+                    <span>Anti-ICP Flags</span>
+                  </h3>
+                  <ul className="icp-anti-flags">
+                    {selected.antiICPFlags.map((flag, idx) => (
+                      <li key={idx} className="icp-anti-flag">
+                        {flag}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+
+                {/* First Target List */}
+                <section className="icp-section">
+                  <h3 className="icp-section-label">First Target List</h3>
+                  <div className="icp-target-chips">
+                    {selected.firstTargetList.map((target, idx) => (
+                      <span key={idx} className="icp-target-chip">
+                        {target}
                       </span>
-                    </div>
-                    <div className="matrix-account-meta">
-                      <AccountTypeBadge type={account.type} />
-                      <RelationshipStrength strength={account.relationshipStrength} />
-                    </div>
-                    <p className="matrix-account-relevance">
-                      {account.strategicRelevance}
-                    </p>
-                    <div className="matrix-account-footer">
-                      <span>{account.dealCount} deal{account.dealCount !== 1 ? 's' : ''}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+
+              <footer className="icp-deliverable-footer">
+                <button
+                  type="button"
+                  className="btn-generate-narrative"
+                  onClick={() => setCurrentModule('narrative-engine')}
+                >
+                  <span>Generate Narrative</span>
+                  <ArrowRight size={16} />
+                </button>
+              </footer>
+            </Card>
+          )}
+        </section>
       </div>
     </div>
   );
