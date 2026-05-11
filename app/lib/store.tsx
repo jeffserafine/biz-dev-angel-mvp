@@ -27,11 +27,10 @@ import {
 export type ModuleView =
   | 'dashboard'
   | 'accounts'
-  | 'icp-matrix'
-  | 'deal-desk'
-  | 'outreach'
-  | 'meetings'
-  | 'assets';
+  | 'icp-forge'
+  | 'deal-map'
+  | 'narrative-engine'
+  | 'bda-pro';
 
 interface AppState {
   // Current view
