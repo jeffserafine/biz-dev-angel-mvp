@@ -1,22 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useApp } from '@/lib/store';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { DealStatusBadge } from '../ui/Badge';
 import { MomentumMeter, MomentumIndicator } from '../ui/MomentumMeter';
 import { ActionList } from '../ui/ActionItem';
 import { getDealHealthIndicators } from '@/data/mockData';
+import { surfaceSignals, getNextBestAction } from '@/lib/coreEngine';
 import type { Deal, DealStatus } from '@/lib/types';
-import { Briefcase, Filter, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Briefcase, Filter, TrendingUp, AlertTriangle, Zap } from 'lucide-react';
 
-export default function DealDesk() {
-  const { deals, actions, accounts, getAccountById, getActionsByDeal } = useApp();
+export default function DealMap() {
+  const { deals, actions, getAccountById, getActionsByDeal } = useApp();
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
   const [filterStatus, setFilterStatus] = useState<DealStatus | 'all'>('all');
   const [sortBy, setSortBy] = useState<'momentum' | 'updated' | 'value'>('momentum');
 
-  // Filter and sort deals
+  const signals = useMemo(() => surfaceSignals(deals, actions), [deals, actions]);
+  const topSignals = signals.slice(0, 2);
+
   const filteredDeals = deals
     .filter(deal => filterStatus === 'all' || deal.status === filterStatus)
     .sort((a, b) => {
@@ -34,23 +37,51 @@ export default function DealDesk() {
     'closed-lost',
   ];
 
-  // Get associated account names
   const getAccountNames = (accountIds: string[]) =>
     accountIds
       .map(id => getAccountById(id)?.name)
       .filter(Boolean)
       .join(', ');
 
+  const focusDealById = (dealId: string) => {
+    const match = deals.find(d => d.id === dealId);
+    if (match) setSelectedDeal(match);
+  };
+
   return (
     <div className="module-container">
       <header className="module-header">
         <div>
-          <h1 className="module-title">Deal Desk</h1>
-          <p className="module-subtitle">Your strategic opportunity pipeline</p>
+          <h1 className="module-title">DealMap</h1>
+          <p className="module-subtitle">Deals are the atomic unit — Core Engine surfaces what moves them forward</p>
         </div>
       </header>
 
-      {/* Filters */}
+      {topSignals.length > 0 && (
+        <div className="core-engine-banner" role="status">
+          <div className="core-engine-banner-header">
+            <Zap size={14} />
+            <span>Core Engine Signals</span>
+          </div>
+          <ul className="core-engine-banner-list">
+            {topSignals.map((signal, idx) => (
+              <li
+                key={`${signal.dealId}-${signal.signalType}-${idx}`}
+                className={`core-engine-signal core-engine-signal--p${signal.priority}`}
+              >
+                <button
+                  type="button"
+                  className="core-engine-signal-button"
+                  onClick={() => focusDealById(signal.dealId)}
+                >
+                  {signal.message}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="filters-bar">
         <div className="filter-group">
           <Filter size={16} />
@@ -77,7 +108,6 @@ export default function DealDesk() {
         </div>
       </div>
 
-      {/* Pipeline Summary */}
       <div className="pipeline-summary">
         <div className="pipeline-stat">
           <span className="pipeline-stat-value">
@@ -93,6 +123,12 @@ export default function DealDesk() {
         </div>
         <div className="pipeline-stat">
           <span className="pipeline-stat-value">
+            {deals.filter(d => d.status === 'closed-won').length}
+          </span>
+          <span className="pipeline-stat-label">Closed Won</span>
+        </div>
+        <div className="pipeline-stat">
+          <span className="pipeline-stat-value">
             {Math.round(
               deals
                 .filter(d => d.status === 'active')
@@ -105,18 +141,25 @@ export default function DealDesk() {
       </div>
 
       <div className="deal-desk-layout">
-        {/* Deal List */}
         <div className="deal-list-container">
           {filteredDeals.map(deal => {
-            const { health, recommendation } = getDealHealthIndicators(deal);
+            const { health } = getDealHealthIndicators(deal);
             const isSelected = selectedDeal?.id === deal.id;
+            const cardModifier =
+              deal.status === 'closed-won'
+                ? 'deal-card--won'
+                : deal.status === 'closed-lost'
+                ? 'deal-card--lost'
+                : health === 'critical'
+                ? 'deal-card--critical'
+                : '';
 
             return (
               <Card
                 key={deal.id}
                 onClick={() => setSelectedDeal(deal)}
                 variant={isSelected ? 'highlight' : 'default'}
-                className={`deal-card ${health === 'critical' ? 'deal-card--critical' : ''}`}
+                className={`deal-card ${cardModifier}`}
               >
                 <CardContent>
                   <div className="deal-card-header">
@@ -139,7 +182,7 @@ export default function DealDesk() {
 
                   <div className="deal-card-next">
                     <span className="next-label">Next:</span>
-                    <span className="next-action">{deal.nextBestAction}</span>
+                    <span className="next-action">{getNextBestAction(deal, actions)}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -147,7 +190,6 @@ export default function DealDesk() {
           })}
         </div>
 
-        {/* Deal Detail Panel */}
         {selectedDeal ? (
           <div className="deal-detail">
             <Card>
@@ -157,6 +199,11 @@ export default function DealDesk() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                <div className="deal-thesis-prominent">
+                  <span className="deal-thesis-label">Deal Thesis</span>
+                  <p className="deal-thesis-text">{selectedDeal.dealThesis}</p>
+                </div>
+
                 <div className="deal-detail-status">
                   <DealStatusBadge status={selectedDeal.status} />
                   {selectedDeal.potentialValue && (
@@ -175,11 +222,6 @@ export default function DealDesk() {
                 </div>
 
                 <div className="detail-section">
-                  <h4 className="detail-label">Deal Thesis</h4>
-                  <p className="detail-text">{selectedDeal.dealThesis}</p>
-                </div>
-
-                <div className="detail-section">
                   <h4 className="detail-label">Last Action</h4>
                   <p className="detail-text">
                     {selectedDeal.lastAction}
@@ -192,7 +234,7 @@ export default function DealDesk() {
                     <AlertTriangle size={16} /> Next Best Action
                   </h4>
                   <div className="next-best-action">
-                    <p className="nba-text">{selectedDeal.nextBestAction}</p>
+                    <p className="nba-text">{getNextBestAction(selectedDeal, actions)}</p>
                     {selectedDeal.nextActionDueDate && (
                       <span className="nba-due">Due: {selectedDeal.nextActionDueDate}</span>
                     )}
@@ -206,7 +248,6 @@ export default function DealDesk() {
                   </div>
                 )}
 
-                {/* Associated Actions */}
                 <div className="detail-section">
                   <h4 className="detail-label">Actions</h4>
                   <ActionList
