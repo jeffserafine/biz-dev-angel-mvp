@@ -27,7 +27,7 @@ export default function Dashboard() {
 
   // Deals requiring attention (momentum < 50 or stalled)
   const dealsNeedingAttention = deals
-    .filter(d => d.status === 'active' && (d.momentumScore < 50 || d.status === 'stalled'))
+    .filter(d => (d.status === 'active' && d.momentumScore < 50) || d.status === 'stalled')
     .slice(0, 3);
 
   // High momentum deals
@@ -103,7 +103,7 @@ export default function Dashboard() {
         {/* Urgent Actions */}
         <Card className="dashboard-card">
           <CardHeader action={
-            <button className="link-button" onClick={() => setCurrentModule('deal-desk')}>
+            <button className="link-button" onClick={() => setCurrentModule('deal-map')}>
               View all <ArrowRight size={14} />
             </button>
           }>
@@ -123,7 +123,7 @@ export default function Dashboard() {
         {/* High Momentum Deals */}
         <Card className="dashboard-card">
           <CardHeader action={
-            <button className="link-button" onClick={() => setCurrentModule('deal-desk')}>
+            <button className="link-button" onClick={() => setCurrentModule('deal-map')}>
               View all <ArrowRight size={14} />
             </button>
           }>
@@ -159,7 +159,7 @@ export default function Dashboard() {
         {/* Deals Needing Attention */}
         <Card className="dashboard-card">
           <CardHeader action={
-            <button className="link-button" onClick={() => setCurrentModule('deal-desk')}>
+            <button className="link-button" onClick={() => setCurrentModule('deal-map')}>
               View all <ArrowRight size={14} />
             </button>
           }>
@@ -192,11 +192,7 @@ export default function Dashboard() {
 
         {/* Upcoming Meetings */}
         <Card className="dashboard-card">
-          <CardHeader action={
-            <button className="link-button" onClick={() => setCurrentModule('meetings')}>
-              View all <ArrowRight size={14} />
-            </button>
-          }>
+          <CardHeader>
             <CardTitle>Upcoming Meetings</CardTitle>
           </CardHeader>
           <CardContent>
