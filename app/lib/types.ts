@@ -137,3 +137,26 @@ export interface CoreEngineSignal {
   message: string;
   priority: 1 | 2 | 3;
 }
+
+/**
+ * Handshake Protocol — BDA Pro only
+ * Five-stage agent-to-agent deal workflow
+ */
+export type HandshakeStage =
+  | 'signal_exchange'
+  | 'fit_assessment'
+  | 'probe_conversation'
+  | 'escalation_report'
+  | 'human_handoff';
+
+export interface HandshakeSession {
+  id: string;
+  linkedDealId: string;
+  stage: HandshakeStage;
+  probeExchangeCount: number; // max 5
+  fitScore?: number;
+  escalationSummary?: string;
+  recommendedNextAction?: string;
+  createdAt: string;
+  updatedAt: string;
+}

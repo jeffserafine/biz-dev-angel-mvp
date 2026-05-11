@@ -6,7 +6,8 @@ import { ActionList } from '../ui/ActionItem';
 import { MomentumMeter } from '../ui/MomentumMeter';
 import { DealStatusBadge } from '../ui/Badge';
 import { getDealHealthIndicators } from '@/data/mockData';
-import { ArrowRight, TrendingUp, AlertTriangle, Zap } from 'lucide-react';
+import { surfaceSignals } from '@/lib/coreEngine';
+import { ArrowRight, TrendingUp, AlertTriangle, Zap, Radio } from 'lucide-react';
 
 export default function Dashboard() {
   const { deals, actions, accounts, setCurrentModule } = useApp();
@@ -40,6 +41,10 @@ export default function Dashboard() {
   const activeDeals = deals.filter(d => d.status === 'active').length;
   const totalAccounts = accounts.length;
   const pendingActions = actions.filter(a => !a.completed).length;
+
+  // Core Engine signals — methodology-driven cues
+  const coreSignals = surfaceSignals(deals, actions);
+  const topCoreSignals = coreSignals.slice(0, 3);
 
   return (
     <div className="module-container">
@@ -142,6 +147,41 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* Core Engine Signals */}
+        <Card className="dashboard-card">
+          <CardHeader action={
+            <button className="link-button" onClick={() => setCurrentModule('deal-map')}>
+              Open DealMap <ArrowRight size={14} />
+            </button>
+          }>
+            <CardTitle>
+              <Radio size={18} className="text-warning" /> Core Engine Signals
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {topCoreSignals.length === 0 ? (
+              <p className="empty-state">No signals — pipeline is steady</p>
+            ) : (
+              <ul className="core-engine-dashboard-list">
+                {topCoreSignals.map((signal, idx) => (
+                  <li
+                    key={`${signal.dealId}-${signal.signalType}-${idx}`}
+                    className={`core-engine-dashboard-item core-engine-signal--p${signal.priority}`}
+                  >
+                    <button
+                      type="button"
+                      className="core-engine-dashboard-button"
+                      onClick={() => setCurrentModule('deal-map')}
+                    >
+                      {signal.message}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Deals Needing Attention */}
         <Card className="dashboard-card">
           <CardHeader action={
@@ -191,6 +231,18 @@ export default function Dashboard() {
               <div className="next-action-primary">
                 <span className="next-action-label">Top Priority:</span>
                 <span className="next-action-text">{urgentActions[0]?.description}</span>
+              </div>
+            </div>
+          ) : topCoreSignals.length > 0 ? (
+            <div className="next-action-content">
+              <p className="next-action-recommendation">
+                No urgent actions queued. The Core Engine surfaced{' '}
+                <strong>{topCoreSignals.length} signal{topCoreSignals.length > 1 ? 's' : ''}</strong>{' '}
+                worth addressing.
+              </p>
+              <div className="next-action-primary">
+                <span className="next-action-label">Top Signal:</span>
+                <span className="next-action-text">{topCoreSignals[0].message}</span>
               </div>
             </div>
           ) : upcomingActions.length > 0 ? (

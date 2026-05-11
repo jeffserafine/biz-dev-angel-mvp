@@ -7,6 +7,7 @@ import Accounts from '../modules/Accounts';
 import ICPForge from '../modules/ICPForge';
 import DealMap from '../modules/DealMap';
 import NarrativeEngine from '../modules/NarrativeEngine';
+import BDAPro from '../modules/BDAPro';
 
 export default function MainLayout() {
   const { currentModule } = useApp();
@@ -23,6 +24,8 @@ export default function MainLayout() {
         return <DealMap />;
       case 'narrative-engine':
         return <NarrativeEngine />;
+      case 'bda-pro':
+        return <BDAPro />;
       default:
         return <Dashboard />;
     }
