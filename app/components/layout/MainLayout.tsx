@@ -4,11 +4,9 @@ import { useApp } from '@/lib/store';
 import Sidebar from './Sidebar';
 import Dashboard from '../modules/Dashboard';
 import Accounts from '../modules/Accounts';
-import ICPMatrix from '../modules/ICPMatrix';
-import DealDesk from '../modules/DealDesk';
-import Outreach from '../modules/Outreach';
-import Meetings from '../modules/Meetings';
-import Assets from '../modules/Assets';
+import ICPForge from '../modules/ICPForge';
+import DealMap from '../modules/DealMap';
+import NarrativeEngine from '../modules/NarrativeEngine';
 
 export default function MainLayout() {
   const { currentModule } = useApp();
@@ -19,16 +17,12 @@ export default function MainLayout() {
         return <Dashboard />;
       case 'accounts':
         return <Accounts />;
-      case 'icp-matrix':
-        return <ICPMatrix />;
-      case 'deal-desk':
-        return <DealDesk />;
-      case 'outreach':
-        return <Outreach />;
-      case 'meetings':
-        return <Meetings />;
-      case 'assets':
-        return <Assets />;
+      case 'icp-forge':
+        return <ICPForge />;
+      case 'deal-map':
+        return <DealMap />;
+      case 'narrative-engine':
+        return <NarrativeEngine />;
       default:
         return <Dashboard />;
     }
