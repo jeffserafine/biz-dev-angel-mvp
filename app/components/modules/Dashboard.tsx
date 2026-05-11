@@ -9,7 +9,7 @@ import { getDealHealthIndicators } from '@/data/mockData';
 import { ArrowRight, TrendingUp, AlertTriangle, Zap } from 'lucide-react';
 
 export default function Dashboard() {
-  const { deals, actions, meetings, accounts, setCurrentModule } = useApp();
+  const { deals, actions, accounts, setCurrentModule } = useApp();
 
   // Today's date for filtering
   const today = new Date().toISOString().split('T')[0];
@@ -34,12 +34,6 @@ export default function Dashboard() {
   const highMomentumDeals = deals
     .filter(d => d.status === 'active' && d.momentumScore >= 70)
     .sort((a, b) => b.momentumScore - a.momentumScore)
-    .slice(0, 3);
-
-  // Upcoming meetings
-  const upcomingMeetings = meetings
-    .filter(m => !m.completed)
-    .sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate))
     .slice(0, 3);
 
   // Summary stats
@@ -86,14 +80,6 @@ export default function Dashboard() {
             <div className="stat-item">
               <span className="stat-value">{totalAccounts}</span>
               <span className="stat-label">Accounts</span>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <div className="stat-item">
-              <span className="stat-value">{upcomingMeetings.length}</span>
-              <span className="stat-label">Upcoming Meetings</span>
             </div>
           </CardContent>
         </Card>
@@ -190,41 +176,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Upcoming Meetings */}
-        <Card className="dashboard-card">
-          <CardHeader>
-            <CardTitle>Upcoming Meetings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {upcomingMeetings.length === 0 ? (
-              <p className="empty-state">No upcoming meetings</p>
-            ) : (
-              <div className="meeting-list">
-                {upcomingMeetings.map(meeting => (
-                  <div key={meeting.id} className="meeting-item">
-                    <div className="meeting-date">
-                      {new Date(meeting.scheduledDate).toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </div>
-                    <div className="meeting-details">
-                      <span className="meeting-title">{meeting.title}</span>
-                      <span className="meeting-time">
-                        {new Date(meeting.scheduledDate).toLocaleTimeString('en-US', {
-                          hour: 'numeric',
-                          minute: '2-digit',
-                        })}
-                        {' • '}{meeting.duration} min
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
 
       {/* What Should I Do Next Section */}
