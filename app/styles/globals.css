@@ -1004,6 +1004,92 @@ pre {
   border-left: 3px solid var(--color-danger);
 }
 
+.deal-card--won {
+  border-left: 3px solid var(--color-success);
+}
+
+.deal-card--lost {
+  border-left: 3px solid var(--color-danger);
+  opacity: 0.7;
+}
+
+.deal-thesis-prominent {
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  background: var(--color-bg-tertiary);
+  border-left: 3px solid var(--color-accent, var(--color-text-primary));
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.deal-thesis-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--spacing-sm);
+}
+
+.deal-thesis-text {
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.core-engine-banner {
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-bg-tertiary);
+  border-left: 3px solid var(--color-warning);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.core-engine-banner-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-warning);
+  margin-bottom: var(--spacing-sm);
+}
+
+.core-engine-banner-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.core-engine-signal-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.core-engine-signal-button:hover {
+  text-decoration: underline;
+}
+
+.core-engine-signal--p1 .core-engine-signal-button {
+  color: var(--color-danger);
+}
+
+.core-engine-signal--p2 .core-engine-signal-button {
+  color: var(--color-warning);
+}
+
 .deal-card-header {
   display: flex;
   align-items: center;
